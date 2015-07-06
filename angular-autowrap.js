@@ -59,12 +59,10 @@
 (function (ng) {
 	"use strict";
 
-	ng.module("angular-autowrap-internal").factory("autowrapController", ["autowrapConfig", function (providedConfig) {
+	ng.module("angular-autowrap-internal").factory("autowrapController", [function () {
 
 		return {
 			init: function init($scope) {
-				var config = {};
-				ng.extend(config, providedConfig, $scope.config);
 
 				$scope._dirty = false;
 				$scope._valid = false;
@@ -121,6 +119,10 @@
 
 		return {
 			getErrorTypes: function getErrorTypes(field) {
+				if (!field) {
+					return [];
+				}
+
 				var props = [];
 				ng.forEach(field.$error, function (value, key) {
 					if (value) {
@@ -202,13 +204,19 @@
 					return;
 				}
 
+				var elementName = element[0].name;
+
 				// defense
-				if (formCtrl == null) {
+				if (!elementName) {
+					throw "The element must have a name attribute for the validation to work.";
+				}
+
+				if (formCtrl === null) {
 					throw "The element, applied 'autowrap' directive, must be placed inside form (or, ngForm) to work for validation messages." + "\nIf this is not a form element that needs tracking of validation status, just add 'autowrap-no-track' property to the element.";
 				}
 
 				if (typeof scope.validators === "object" && utility.hasAnyProperty(scope.validators)) {
-					if (modelCtrl == null) {
+					if (modelCtrl === null) {
 						throw "To use custom validators with 'autowrap', the element must have ngModel directive applied to it.";
 					} else {
 						ng.forEach(scope.validators, function (validationFunction, validationName) {
@@ -218,8 +226,6 @@
 				}
 
 				// set watches
-				var elementName = element[0].name;
-
 				linkerHelper.setWatch(scope, formCtrl, elementName, "$dirty", "_dirty");
 
 				linkerHelper.setWatch(scope, formCtrl, elementName, "$valid", "_valid", function (valid) {
@@ -304,7 +310,7 @@
 					}
 				}
 
-				return null;
+				return defaultTemplate;
 			},
 
 			put: function put(template, fieldType, theme) {
@@ -330,13 +336,26 @@
 			},
 
 			getCamelCasedAttributeName: function getCamelCasedAttributeName(dashedAttributeName, prefix) {
+				if (!dashedAttributeName) {
+					return dashedAttributeName;
+				}
+
 				var prop = dashedAttributeName.split("-").map(function (x) {
 					return ng.uppercase(x.substring(0, 1)) + x.substring(1);
 				}).join("");
-				return prefix + prop;
+
+				if (prefix) {
+					return prefix + prop;
+				}
+
+				return ng.lowercase(prop[0]) + prop.substring(1);
 			},
 
 			isUpperCase: function isUpperCase(str) {
+				if (!str) {
+					return false;
+				}
+
 				return ng.uppercase(str) === str;
 			},
 

@@ -2,7 +2,7 @@
 	"name": "angular-autowrap",
 	"description": "An easier and less noisy way of doing validation and designing control template in angularjs",
 	"license": "MIT",
-	"version": "0.6.1",
+	"version": "0.6.2",
 	"authors": [
 		{ "name": "Zp Bappi", "email": "zpbappi@gmail.com", "homepage": "http://zpbappi.com" }
 	],
